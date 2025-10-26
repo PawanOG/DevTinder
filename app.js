@@ -2,43 +2,50 @@
 
 //installing express
 
+require('./src/config/database')
+
 const express = require('express');
-
 const app = express();
+const { adminAuth } = require("./src/utils/middlewares/auth");
+const { userAuth } = require("./src/utils/middlewares/auth");
+const connectDB = require("./src/config/database");
+const User = require("./src/MODELS/user");
+
+
+// middlewsare that uses json data  and convert into js
+app.use(express.json());
 
 
 
-///request handlers for /hello and /test
+app.post("/signup", async (req, res) => {
 
+    const user = new User(req.body);
 
-// app.use("/hello",(req,res) => {
-//     res.send('Hello hello hello');
-// } )
-
-
-// app.use("/test" ,(req, res) => { 
-//     res.send("hello from server");
-// })
-
-//listenining to 7777
-
-app.listen(7777, () => { 
-
-    console.log('Server is running on port 7777');
+    await user.save();
+   try{
+    res.send("User signed up successfully");
+   }
+   catch(err){
+    res.status(500).send("Error signing up user");
+   }
 });
 
-app.use("/user", (req,res) => {
-    res.send("general for all users");
-})
+connectDB()
+    .then(() => {
+        console.log("Database connected successfully");
+
+        app.listen(7777, () => {
+            connectDB,
+
+                console.log('Server is running on port 7777');
+        });
 
 
-app.get("/user", (req,res) => {
-    res.send("get succesuflly");
-})
 
-app.delete("/user", (req,res) => {
-    res.send("deleted successfully");
-})
+    })
+    .catch((err) => {
+        console.log("Database connection failed");
 
+    });
 
 
